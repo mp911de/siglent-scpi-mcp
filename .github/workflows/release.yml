@@ -1,0 +1,65 @@
+name: Release it 💫
+
+env:
+  NPM_VERSION: "11.17.0"
+
+on:
+  workflow_dispatch:
+    inputs:
+      increment:
+        description: Version increment
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      dry_run:
+        description: Dry run (no commit, tag, or release)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # push the release commit + tag, create the GitHub release
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    environment: npmjs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history + tags: release-it resolves the previous tag, and your changelog tool scans the range
+          token: ${{ secrets.DEPLOY_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+
+      - name: Install npm with install-script policy support
+        run: npm install --global "npm@$NPM_VERSION"
+
+      - name: Configure GitBot identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code
+        run: npm run check
+
+      - name: Run tests
+        run: npm test
+
+      - name: Create release
+        run: npx release-it ${{ inputs.increment }} --ci ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }} # release-it uses this for the GitHub release
+          GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }} # your changelog tool (releaseNotes hook) uses this

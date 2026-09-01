@@ -1,0 +1,20 @@
+{
+	"git": {
+		"commitMessage": "Release ${version}.",
+		"tagName": "${version}",
+		"push": true,
+		"requireBranch": "main",
+		"requireCleanWorkingDir": true,
+		"addUntrackedFiles": false,
+		"changelog": "node node_modules/@mp911de/changelog/dist/cli.js ${from}..${to} -O -"
+	},
+	"github": {
+		"release": true
+	},
+	"hooks": {
+		"after:bump": "npm run build && git add --force dist"
+	},
+	"npm": {
+		"publish": false
+	}
+}

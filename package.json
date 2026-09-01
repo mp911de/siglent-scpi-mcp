@@ -1,0 +1,57 @@
+{
+	"name": "@mp911de/siglent-scpi-mcp",
+	"version": "0.1.0",
+	"description": "MCP server for Siglent oscilloscopes: SCPI over TCP, Streamable HTTP transport, observability built in",
+	"type": "module",
+	"license": "Apache-2.0",
+	"author": "Mark Paluch",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mp911de/siglent-scpi-mcp.git"
+	},
+	"homepage": "https://github.com/mp911de/siglent-scpi-mcp#readme",
+	"bugs": "https://github.com/mp911de/siglent-scpi-mcp/issues",
+	"bin": {
+		"siglent-scpi-mcp": "dist/cli.js"
+	},
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"dev": "node src/cli.ts",
+		"clean": "node scripts/clean.ts",
+		"build": "npm run clean && tsc -p tsconfig.build.json",
+		"prepack": "npm run build",
+		"check": "biome ci . && tsc --noEmit",
+		"lint": "biome check --write .",
+		"test": "LOG_LEVEL=silent node --test 'test/**/*.test.ts'",
+		"test:ci": "LOG_LEVEL=silent node --test-concurrency=2 --test --test-reporter=spec --test-reporter=junit --test-reporter-destination=stdout --test-reporter-destination=test-results.xml 'test/**/*.test.ts'",
+		"release": "release-it"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/node": "^2.0.0",
+		"@modelcontextprotocol/server": "^2.0.0",
+		"@opentelemetry/api": "^1.9.1",
+		"pino": "^10.3.1",
+		"zod": "^4.5.4"
+	},
+	"devDependencies": {
+		"@assertive-ts/core": "^2.1.0",
+		"@biomejs/biome": "^2.5.11",
+		"@modelcontextprotocol/client": "^2.0.0",
+		"@mp911de/changelog": "0.1.2",
+		"@opentelemetry/sdk-node": "^0.222.0",
+		"@types/node": "^26.4.0",
+		"release-it": "^21.0.2",
+		"typescript": "^7.0.2"
+	},
+	"allowScripts": {
+		"protobufjs@7.6.6": true
+	}
+}

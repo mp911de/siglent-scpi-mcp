@@ -1,0 +1,7 @@
+.hg
+node_modules
+dist
+test
+issue
+*.pdf
+*.md
